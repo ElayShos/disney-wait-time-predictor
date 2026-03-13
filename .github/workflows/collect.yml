@@ -13,9 +13,6 @@ concurrency:
   group: wait-time-collector
   cancel-in-progress: false
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
 jobs:
   run-script:
     runs-on: ubuntu-latest
@@ -24,7 +21,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          persist-credentials: true
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -37,19 +34,21 @@ jobs:
       - name: Run data collector
         run: python collect_data.py
 
-      - name: Commit updated data
+      - name: Commit and push data
         run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "actions@github.com"
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
 
-          # make sure repo is up to date
-          git pull origin main --rebase
-
-          # add data files
           git add data/*.csv
 
-          # commit only if there are changes
-          git diff --cached --quiet || git commit -m "Update wait time data"
+          # commit only if files changed
+          if ! git diff --cached --quiet; then
+            git commit -m "Update wait time data"
 
-          # push changes
-          git push origin main
+            # always sync with latest remote before pushing
+            git pull --rebase origin main
+
+            git push origin main
+          else
+            echo "No changes to commit"
+          fi
