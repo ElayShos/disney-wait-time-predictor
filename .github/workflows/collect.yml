@@ -12,7 +12,7 @@ permissions:
 
 concurrency:
   group: wait-time-data
-  cancel-in-progress: true
+  cancel-in-progress: false  # Changed to false
 
 jobs:
   collect:
