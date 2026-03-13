@@ -24,8 +24,8 @@ parks = {
 
 rides = {
     "mk": {
-        "TRON Lightcycle / Run"
-        "Seven Dwarfs Mine Train"
+        "TRON Lightcycle / Run",
+        "Seven Dwarfs Mine Train",
         "Jungle Cruise",
         "Tiana's Bayou Adventure",
         "Peter Pan's Flight",
