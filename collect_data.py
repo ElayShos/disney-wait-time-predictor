@@ -85,6 +85,7 @@ timestamp = datetime.now(ZoneInfo("America/New_York"))
 
 for park in wdw:
 
+    ark_name = parks[park]
     row = {}
 
     data = requests.get(park).json()
@@ -105,8 +106,6 @@ for park in wdw:
                 row[ride_name] = wait_time if wait_time else None
 
     df = pd.DataFrame([row], [timestamp])
-
-    park_name = parks[park]
 
     file = "data/wait"+ park_name.upper() +".csv"
 
