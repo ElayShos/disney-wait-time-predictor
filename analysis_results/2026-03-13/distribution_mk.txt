@@ -3,28 +3,37 @@ Date: 2026-03-13
 =============================================
 
 Ride: TRON Lightcycle / Run
-  80-90         : 100.0%
+  80-90         :  85.7%
+  110-120       :  14.3%
 --------------------
 
 Ride: Jungle Cruise
-  35-45         : 100.0%
+  35-45         :  57.1%
+  50-60         :  28.6%
+  65-75         :  14.3%
 --------------------
 
 Ride: Seven Dwarfs Mine Train
-  50-60         :  25.0%
-  65-75         :  75.0%
+  50-60         :  14.3%
+  65-75         :  71.4%
+  80-90         :  14.3%
 --------------------
 
 Ride: The Magic Carpets of Aladdin
-  5-15          : 100.0%
+  5-15          :  71.4%
+  35-45         :  28.6%
 --------------------
 
 Ride: Mad Tea Party
-  5-15          : 100.0%
+  5-15          :  71.4%
+  20-30         :  14.3%
+  35-45         :  14.3%
 --------------------
 
 Ride: The Many Adventures of Winnie the Pooh
-  35-45         : 100.0%
+  35-45         :  71.4%
+  50-60         :  14.3%
+  65-75         :  14.3%
 --------------------
 
 Ride: The Barnstormer
@@ -36,15 +45,18 @@ Ride: Haunted Mansion
 --------------------
 
 Ride: Tiana's Bayou Adventure
-  65-75         : 100.0%
+  65-75         :  85.7%
+  95-105        :  14.3%
 --------------------
 
 Ride: Space Mountain
-  50-60         : 100.0%
+  50-60         :  71.4%
+  65-75         :  28.6%
 --------------------
 
 Ride: Peter Pan's Flight
-  50-60         : 100.0%
+  50-60         :  85.7%
+  65-75         :  14.3%
 --------------------
 
 Ride: Mickey's PhilharMagic
@@ -56,15 +68,19 @@ Ride: Tomorrowland Speedway
 --------------------
 
 Ride: Pirates of the Caribbean
-  Closed Down   : 100.0%
+  Closed Down   :  85.7%
+  5-15          :  14.3%
 --------------------
 
 Ride: Dumbo the Flying Elephant
-  35-45         : 100.0%
+  20-30         :  14.3%
+  35-45         :  85.7%
 --------------------
 
 Ride: Under the Sea - Journey of The Little Mermaid
-  35-45         : 100.0%
+  20-30         :  14.3%
+  35-45         :  71.4%
+  50-60         :  14.3%
 --------------------
 
 Ride: Monsters Inc. Laugh Floor

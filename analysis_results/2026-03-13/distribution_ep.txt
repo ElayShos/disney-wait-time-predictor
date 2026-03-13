@@ -3,7 +3,8 @@ Date: 2026-03-13
 =============================================
 
 Ride: Soarin'
-  50-60         : 100.0%
+  35-45         :  28.6%
+  50-60         :  71.4%
 --------------------
 
 Ride: Living with the Land
@@ -11,13 +12,14 @@ Ride: Living with the Land
 --------------------
 
 Ride: Test Track
-  95-105        :  75.0%
-  110-120       :  25.0%
+  95-105        :  57.1%
+  110-120       :  42.9%
 --------------------
 
 Ride: Guardians of the Galaxy: Cosmic Rewind
-  80-90         :  25.0%
-  95-105        :  75.0%
+  80-90         :  28.6%
+  95-105        :  42.9%
+  110-120       :  28.6%
 --------------------
 
 Ride: Mission: SPACE
@@ -29,16 +31,18 @@ Ride: The Seas with Nemo & Friends
 --------------------
 
 Ride: Spaceship Earth
-  5-15          :  75.0%
-  20-30         :  25.0%
+  5-15          :  42.9%
+  20-30         :  57.1%
 --------------------
 
 Ride: Remy's Ratatouille Adventure
-  80-90         : 100.0%
+  80-90         :  71.4%
+  95-105        :  28.6%
 --------------------
 
 Ride: Gran Fiesta Tour Starring The Three Caballeros
-  5-15          : 100.0%
+  5-15          :  71.4%
+  20-30         :  28.6%
 --------------------
 
 Ride: Frozen Ever After
