@@ -1,25 +1,14 @@
-import requests
+import pandas as pd
+import glob
+import os
 
-# Hollywood Studios Live API
-hs_url = "https://api.themeparks.wiki/v1/entity/288747d1-8b4f-4a64-867e-ea7c9b27bad8/live"
-
-try:
-    print("Connecting to API...")
-    response = requests.get(hs_url)
-    response.raise_for_status()
-    data = response.json()
+def load_all_data(park_code):
+    path = f"data/*/wait{park_code.upper()}.csv"
+    all_files = glob.glob(path)
     
-    print("\n--- ALL RIDES IN HOLLYWOOD STUDIOS ---")
-    found_any = False
-    for ride in data.get("liveData", []):
-        if ride.get("entityType") == "ATTRACTION":
-            print(f"Name: {ride['name']}")
-            found_any = True
-            
-    if not found_any:
-        print("No attractions found in the live data.")
+    if not all_files:
+        return None
         
-except Exception as e:
-    print(f"Error: {e}")
-
-input("\nPress Enter to close...")
+    df_list = [pd.read_csv(f, index_col=0) for f in all_files]
+    return pd.concat(df_list).sort_index()
+print(load_all_data("MK"))
