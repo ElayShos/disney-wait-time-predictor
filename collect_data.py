@@ -67,7 +67,7 @@ rides = {
         "Slinky Dog Dash",
         "Mickey & Minnie's Runaway Railway",
         "Toy Story Mania!",
-        "Star Tours – The Adventures Continue"
+        "Star Tours - The Adventures Continue"
     },
 
     "ak": {
