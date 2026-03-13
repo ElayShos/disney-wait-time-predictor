@@ -2,9 +2,9 @@ name: Collect Disney Wait Time Data
 
 on:
   schedule:
-    # זמני UTC שתואמים ל-06:00 עד 01:00 באורלנדו (לפי שעון חורף EST)
-    - cron: "*/5 11-23 * * *"
-    - cron: "*/5 0-7 * * *"
+    # ריצה בכל דקה 0, 15, 30 ו-45 בכל שעה בטווח השעות שנבחר
+    - cron: "0,15,30,45 11-23 * * *"
+    - cron: "0,15,30,45 0-6 * * *"
   workflow_dispatch:
 
 permissions:
