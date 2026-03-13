@@ -24,8 +24,10 @@ steps:
     with:
       fetch-depth: 0
 
-  - name: Pull latest data
-    run: git pull origin main
+  - name: Reset repo to latest commit
+    run: |
+      git fetch origin
+      git reset --hard origin/main
 
   - name: Setup Python
     uses: actions/setup-python@v5
@@ -38,7 +40,7 @@ steps:
   - name: Run data collector
     run: python collect_data.py
 
-  - name: Commit and push updated CSV files
+  - name: Commit updated data
     run: |
       git config --global user.name "github-actions"
       git config --global user.email "actions@github.com"
@@ -46,6 +48,5 @@ steps:
       git add data/*.csv
       git commit -m "Update wait time data" || echo "No changes"
 
-      git pull --rebase origin main
-      git push origin main
+      git push
 ```
