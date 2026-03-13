@@ -79,10 +79,10 @@ def save_daily_distribution(df, park_code, date_str):
         output_lines.append("-" * 20)
 
     # --- Directory Logic ---
-    date_folder = Path("analysis_results") / date_str
+    date_folder = Path("analysis_results") / park_code
     date_folder.mkdir(parents=True, exist_ok=True)
     
-    filename = date_folder / f"distribution_{park_code}.txt"
+    filename = date_folder / f"distribution_{date_str}.txt"
     with open(filename, "w", encoding="utf-8") as f:
         f.write("\n".join(output_lines))
 
