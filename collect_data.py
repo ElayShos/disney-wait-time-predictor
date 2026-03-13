@@ -107,12 +107,13 @@ for park in wdw:
 
     df = pd.DataFrame([row], [timestamp])
 
-    file = "data/wait"+ park_name.upper() +".csv"
+    file = "data/wait" + park_name.upper() + ".csv"
 
     if os.path.exists(file):
-        df.to_csv(file, mode="a", header=False)
+        old = pd.read_csv(file, index_col=0)
+        df = pd.concat([old, df])
+        df.to_csv(file)
     else:
         df.to_csv(file)
-    print("Data collected:", len(row))
 
 print("Collected Data for all parks at", timestamp)
