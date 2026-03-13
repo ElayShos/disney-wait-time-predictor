@@ -1,56 +1,69 @@
 import requests
 import pandas as pd
 from datetime import datetime
-import os
-from datetime import datetime
 from zoneinfo import ZoneInfo
+import os
 
+# ensure data folder exists
+os.makedirs("data", exist_ok=True)
+
+# park ids
 mk = "75ea578a-adc8-4116-a54d-dccb60765ef9"
 ep = "47f90d2c-e191-4239-a466-5892ef59a88b"
 hs = "288747d1-8b4f-4a64-867e-ea7c9b27bad8"
 ak = "1c84a229-8862-4648-9c71-378ddd2c7693"
 
-mkurl = "https://api.themeparks.wiki/v1/entity/" + mk + "/live"
-epurl = "https://api.themeparks.wiki/v1/entity/" + ep + "/live"
-hsurl = "https://api.themeparks.wiki/v1/entity/" + hs + "/live"
-akurl = "https://api.themeparks.wiki/v1/entity/" + ak + "/live"
+parks = {
+    "mk": mk,
+    "ep": ep,
+    "hs": hs,
+    "ak": ak
+}
 
-wdw = [mkurl, epurl, hsurl, akurl]
+base_url = "https://api.themeparks.wiki/v1/entity/{}/live"
 
-timestamp = datetime.now(ZoneInfo("America/New_York"))
+# timestamp in Orlando time
+timestamp = datetime.now(ZoneInfo("America/New_York")).replace(second=0, microsecond=0)
 
-for park in wdw:
+rows = []
 
-    row = {}
+for park_name, park_id in parks.items():
 
-    data = requests.get(park).json()
+    url = base_url.format(park_id)
+    data = requests.get(url).json()
 
     for ride in data["liveData"]:
 
-        if ride.get("entityType") == "ATTRACTION" and "queue" in ride and "STANDBY" in ride["queue"]:
+        if ride.get("entityType") == "ATTRACTION":
 
-            ride_name = ride["name"]
-            wait_time = ride["queue"]["STANDBY"]["waitTime"]
+            queue = ride.get("queue", {})
+            standby = queue.get("STANDBY", {})
 
-            row[ride_name] = wait_time
+            wait_time = standby.get("waitTime")
 
-    df = pd.DataFrame([row], [timestamp])
+            if wait_time is None:
+                continue
 
-    parks = {
-        mkurl: "mk",
-        epurl: "ep",
-        hsurl: "hs",
-        akurl: "ak"
-    }
+            rows.append({
+                "timestamp": timestamp,
+                "park": park_name.upper(),
+                "ride": ride["name"],
+                "wait_time": wait_time,
+                "hour": timestamp.hour,
+                "day_of_week": timestamp.weekday()
+            })
 
-    park_name = parks[park]
+print("Collected rides:", len(rows))
 
-    file = "data/wait"+ park_name.upper() +".csv"
+df = pd.DataFrame(rows)
 
-    if os.path.exists(file):
-        df.to_csv(file, mode="a", header=False)
-    else:
-        df.to_csv(file)
-    print("Data collected:", len(row))
+file = "data/wait_times.csv"
 
-print("Collected Data for all parks at", timestamp)
+df.to_csv(
+    file,
+    mode="a",
+    header=not os.path.exists(file),
+    index=False
+)
+
+print("Saved data at:", timestamp)
