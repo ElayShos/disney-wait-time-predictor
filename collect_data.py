@@ -85,7 +85,7 @@ timestamp = datetime.now(ZoneInfo("America/New_York"))
 
 for park in wdw:
 
-    ark_name = parks[park]
+    park_name = parks[park]
     row = {}
 
     data = requests.get(park).json()
