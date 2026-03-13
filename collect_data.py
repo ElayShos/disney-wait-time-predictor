@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
 import requests
 import pandas as pd
 import os
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-# Park IDs
 mk = "75ea578a-adc8-4116-a54d-dccb60765ef9"
 ep = "47f90d2c-e191-4239-a466-5892ef59a88b"
 hs = "288747d1-8b4f-4a64-867e-ea7c9b27bad8"
@@ -36,10 +34,14 @@ rides = {
         "The Seas with Nemo & Friends"
     },
     "hs": {
-        "Star Wars: Rise of the Resistance", "Rock 'n' Roller Coaster Starring Aerosmith",
-        "The Twilight Zone Tower of Terror", "Millennium Falcon: Smugglers Run",
-        "Slinky Dog Dash", "Mickey & Minnie's Runaway Railway", "Toy Story Mania!",
-        "Star Tours - The Adventures Continue"
+        "Star Wars: Rise of the Resistance", 
+        "Rock 'n' Roller Coaster Starring Aerosmith",
+        "The Twilight Zone Tower of Terror",
+        "Millennium Falcon: Smugglers Run",
+        "Slinky Dog Dash", 
+        "Mickey & Minnie's Runaway Railway", 
+        "Toy Story Mania!",
+        "Star Tours"
     },
     "ak": {
         "Expedition Everest - Legend of the Forbidden Mountain", "Avatar Flight of Passage",
@@ -47,12 +49,10 @@ rides = {
     }
 }
 
-# Time setup
 now_orlando = datetime.now(ZoneInfo("America/New_York"))
 date_str = now_orlando.strftime("%Y-%m-%d")
-timestamp = now_orlando.strftime("%Y-%m-%d %H:%M:%S")
+timestamp = now_orlando.strftime("%Y-%m-%d %H:%M")
 
-# Create a specific directory for the date: data/YYYY-MM-DD
 target_dir = os.path.join("data", date_str)
 os.makedirs(target_dir, exist_ok=True)
 
@@ -67,15 +67,16 @@ for url, park_name in parks.items():
             if ride.get("entityType") == "ATTRACTION":
                 ride_name = ride["name"]
                 
-                if ride_name in rides[park_name]:
+                match = next((r for r in rides[park_name] if ride_name.startswith(r)), None)
+
+                if match:
                     if "queue" in ride and "STANDBY" in ride["queue"]:
                         wait_time = ride["queue"]["STANDBY"]["waitTime"]
-                        row[ride_name] = wait_time if wait_time is not None else None
+                        row[match] = wait_time if wait_time is not None else None
 
         if row:
             df_new = pd.DataFrame([row], index=[timestamp])
             
-            # File path: data/YYYY-MM-DD/waitMK.csv
             file_path = os.path.join(target_dir, f"wait{park_name.upper()}.csv")
 
             if os.path.exists(file_path):
@@ -85,7 +86,7 @@ for url, park_name in parks.items():
             else:
                 df_new.to_csv(file_path)
                 
-            print(f"Updated {park_name} in {target_dir}")
+            print(f"Updated {park_name} for {timestamp}")
 
     except Exception as e:
         print(f"Error collecting data for {park_name}: {e}")

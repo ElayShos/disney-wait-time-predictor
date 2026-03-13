@@ -1,45 +1,25 @@
-import pandas as pd
 import requests
-import pandas as pd
-from datetime import datetime
-import os
-from datetime import datetime
 
-row = {}
+# Hollywood Studios Live API
+hs_url = "https://api.themeparks.wiki/v1/entity/288747d1-8b4f-4a64-867e-ea7c9b27bad8/live"
 
-ride_name = "Space Mountain"
-wait_time = 45
-row[ride_name] = wait_time
+try:
+    print("Connecting to API...")
+    response = requests.get(hs_url)
+    response.raise_for_status()
+    data = response.json()
+    
+    print("\n--- ALL RIDES IN HOLLYWOOD STUDIOS ---")
+    found_any = False
+    for ride in data.get("liveData", []):
+        if ride.get("entityType") == "ATTRACTION":
+            print(f"Name: {ride['name']}")
+            found_any = True
+            
+    if not found_any:
+        print("No attractions found in the live data.")
+        
+except Exception as e:
+    print(f"Error: {e}")
 
-ride_name = "Tron"
-wait_time = 65
-row[ride_name] = wait_time
-time = ["15:00"]
-
-df = pd.DataFrame([row], [time])
-
-ride_name = "Space Mountain"
-wait_time = 35
-row[ride_name] = wait_time
-
-ride_name = "Tron"
-wait_time = 75
-row[ride_name] = wait_time
-time = ["16:00"]
-
-df = pd.concat([df, pd.DataFrame([row], [time])])
-
-print(df)
-
-mkurl = "https://api.themeparks.wiki/v1/entity/75ea578a-adc8-4116-a54d-dccb60765ef9/live"
-
-data = requests.get(mkurl).json()
-
-for ride in data["liveData"]:
-    if (
-        ride.get("entityType") == "ATTRACTION"
-        and "queue" in ride
-        and "STANDBY" in ride["queue"]
-    ):
-        wait = ride["queue"]["STANDBY"]["waitTime"]
-        print(ride["name"], wait)
+input("\nPress Enter to close...")
