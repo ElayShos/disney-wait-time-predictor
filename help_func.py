@@ -1,7 +1,6 @@
 from datetime import datetime
 
 def convert_date(user_date):
-    # Support multiple formats: User input and Automation timestamp
     formats = ["%d/%m/%Y", "%Y-%m-%d %H:%M", "%Y-%m-%d"]
     
     for fmt in formats:
