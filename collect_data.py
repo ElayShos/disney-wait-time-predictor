@@ -48,7 +48,7 @@ rides = {
     "ak": [
         "Expedition Everest - Legend of the Forbidden Mountain",
         "Avatar Flight of Passage",
-        "Na've River Journey",
+        "Na'vi River Journey",
         "Kilimanjaro Safaris",
         "Kali River Rapids"
     ]
@@ -59,62 +59,61 @@ now_orlando = datetime.now(ZoneInfo("America/New_York"))
 date_str = now_orlando.strftime("%Y-%m-%d")
 timestamp = now_orlando.strftime("%Y-%m-%d %H:%M")
 
-# Create date folder
 target_dir = os.path.join("data", date_str)
 os.makedirs(target_dir, exist_ok=True)
 
 for url, park_name in parks.items():
-
     try:
         response = requests.get(url)
         response.raise_for_status()
         data = response.json()
 
         row = {}
+        found_any_data = False
 
-        # If park is closed, fill all rides with None (empty in CSV)
-        if data.get("status") != "OPERATING":
-            row = {ride: None for ride in rides[park_name]}
+        live_data = data.get("liveData", [])
+        
+        for ride_info in live_data:
+            if ride_info.get("entityType") == "ATTRACTION":
+                api_ride_name = ride_info.get("name", "")
+                
+                # Check for match in our list
+                match = next((r for r in rides[park_name] if api_ride_name.startswith(r)), None)
 
-        else:
-            for ride in data.get("liveData", []):
-                if ride.get("entityType") == "ATTRACTION":
-                    ride_name = ride["name"]
-                    match = next((r for r in rides[park_name] if ride_name.startswith(r)), None)
+                if match:
+                    queue = ride_info.get("queue", {})
+                    # If STANDBY exists, get the wait time
+                    if "STANDBY" in queue:
+                        wait_time = queue["STANDBY"].get("waitTime")
+                        row[match] = wait_time
+                        if wait_time is not None:
+                            found_any_data = True
+                    else:
+                        row[match] = None
 
-                    if match:
-                        wait_time = (
-                            ride.get("queue", {})
-                            .get("STANDBY", {})
-                            .get("waitTime")
-                        )
-                        # Store wait time or None if it's not available
-                        row[match] = wait_time if wait_time is not None else None
+        # Fill missing rides in the row with None
+        for ride in rides[park_name]:
+            if ride not in row:
+                row[ride] = None
 
-            # Ensure every predefined ride is in the row (fill missing with None)
-            for ride in rides[park_name]:
-                row.setdefault(ride, None)
-
-        # Create dataframe
+        # Create/Update CSV
         df_new = pd.DataFrame([row], index=[timestamp])
-        df_new = df_new[rides[park_name]]  # Enforce column order
+        df_new = df_new[rides[park_name]]
 
-        # File path
         file_name = f"wait{park_name.upper()}.csv"
         file_path = os.path.join(target_dir, file_name)
 
         if os.path.exists(file_path):
             old_df = pd.read_csv(file_path, index_col=0)
             df_combined = pd.concat([old_df, df_new])
-            # Drop duplicates if run multiple times in the same minute
             df_combined = df_combined[~df_combined.index.duplicated(keep='last')]
             df_combined.to_csv(file_path)
         else:
             df_new.to_csv(file_path)
 
-        print(f"Updated {park_name} for {timestamp}")
+        print(f"Updated {park_name} at {timestamp}. Data found: {found_any_data}")
 
     except Exception as e:
-        print(f"Error collecting data for {park_name}: {e}")
+        print(f"Error for {park_name}: {e}")
 
 print("Job completed.")
