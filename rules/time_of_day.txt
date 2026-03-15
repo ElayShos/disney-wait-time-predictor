@@ -1,0 +1,6 @@
+Morning,06:00,10:00
+Late Morning,10:01,12:00
+Noon,12:01,14:00
+Afternoon,14:01,17:00
+Evening,17:01,19:00
+Night,19:01,23:59

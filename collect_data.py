@@ -19,36 +19,39 @@ parks = {
 }
 
 rides = {
-    "mk": {
+    "mk": [
         "TRON Lightcycle / Run", "Seven Dwarfs Mine Train", "Jungle Cruise",
         "Tiana's Bayou Adventure", "Peter Pan's Flight", "Big Thunder Mountain Railroad",
         "Space Mountain", "The Barnstormer", "Dumbo the Flying Elephant",
         "Haunted Mansion", "it's a small world", "The Magic Carpets of Aladdin",
         "Mad Tea Party", "Mickey's PhilharMagic", "The Many Adventures of Winnie the Pooh",
-        "Pirates of the Caribbean", "Tomorrowland Speedway", 
+        "Pirates of the Caribbean", "Tomorrowland Speedway",
         "Under the Sea - Journey of The Little Mermaid", "Monsters Inc. Laugh Floor",
         "Buzz Lightyear's Space Ranger Spin"
-    },
-    "ep": {
+    ],
+    "ep": [
         "Test Track", "Guardians of the Galaxy: Cosmic Rewind", "Remy's Ratatouille Adventure",
         "Soarin'", "Living with the Land", "Spaceship Earth", "Mission: SPACE",
         "Frozen Ever After", "Gran Fiesta Tour Starring The Three Caballeros",
         "The Seas with Nemo & Friends"
-    },
-    "hs": {
-        "Star Wars: Rise of the Resistance", 
+    ],
+    "hs": [
+        "Star Wars: Rise of the Resistance",
         "Rock 'n' Roller Coaster Starring Aerosmith",
-        "The Twilight Zone Tower of Terror", 
+        "The Twilight Zone Tower of Terror",
         "Millennium Falcon: Smugglers Run",
-        "Slinky Dog Dash", 
-        "Mickey & Minnie's Runaway Railway", 
+        "Slinky Dog Dash",
+        "Mickey & Minnie's Runaway Railway",
         "Toy Story Mania!",
         "Star Tours"
-    },
-    "ak": {
-        "Expedition Everest - Legend of the Forbidden Mountain", "Avatar Flight of Passage",
-        "Na'vi River Journey", "Kilimanjaro Safaris", "Kali River Rapids"
-    }
+    ],
+    "ak": [
+        "Expedition Everest - Legend of the Forbidden Mountain",
+        "Avatar Flight of Passage",
+        "Na'vi River Journey",
+        "Kilimanjaro Safaris",
+        "Kali River Rapids"
+    ]
 }
 
 # Time setup
@@ -56,44 +59,64 @@ now_orlando = datetime.now(ZoneInfo("America/New_York"))
 date_str = now_orlando.strftime("%Y-%m-%d")
 timestamp = now_orlando.strftime("%Y-%m-%d %H:%M")
 
-# Create a specific directory for the date: data/YYYY-MM-DD
+# Create date folder
 target_dir = os.path.join("data", date_str)
 os.makedirs(target_dir, exist_ok=True)
 
 for url, park_name in parks.items():
-    row = {}
+
     try:
         response = requests.get(url)
         response.raise_for_status()
         data = response.json()
 
-        for ride in data.get("liveData", []):
-            if ride.get("entityType") == "ATTRACTION":
-                ride_name = ride["name"]
-                
-                # Check for match using startswith
-                match = next((r for r in rides[park_name] if ride_name.startswith(r)), None)
+        row = {}
 
-                if match:
-                    if "queue" in ride and "STANDBY" in ride["queue"]:
-                        wait_time = ride["queue"]["STANDBY"]["waitTime"]
-                        row[match] = wait_time if wait_time is not None else None
+        # Check if park is operating
+        if data.get("status") != "OPERATING":
+            # Park closed → all rides 0
+            row = {ride: 0 for ride in rides[park_name]}
 
-        if row:
-            df_new = pd.DataFrame([row], index=[timestamp])
-            
-            # File path: data/YYYY-MM-DD/waitMK.csv
-            file_name = f"wait{park_name.upper()}.csv"
-            file_path = os.path.join(target_dir, file_name)
+        else:
+            for ride in data.get("liveData", []):
+                if ride.get("entityType") == "ATTRACTION":
 
-            if os.path.exists(file_path):
-                old_df = pd.read_csv(file_path, index_col=0)
-                df_combined = pd.concat([old_df, df_new], sort=False)
-                df_combined.to_csv(file_path)
-            else:
-                df_new.to_csv(file_path)
-                
-            print(f"Updated {park_name} for {timestamp}")
+                    ride_name = ride["name"]
+
+                    match = next(
+                        (r for r in rides[park_name] if ride_name.startswith(r)),
+                        None
+                    )
+
+                    if match:
+                        wait_time = (
+                            ride.get("queue", {})
+                            .get("STANDBY", {})
+                            .get("waitTime")
+                        )
+
+                        row[match] = wait_time if wait_time is not None else 0
+
+            # Ensure every ride exists in the row
+            for ride in rides[park_name]:
+                row.setdefault(ride, 0)
+
+        # Create dataframe
+        df_new = pd.DataFrame([row], index=[timestamp])
+        df_new = df_new[rides[park_name]]  # enforce column order
+
+        # File path
+        file_name = f"wait{park_name.upper()}.csv"
+        file_path = os.path.join(target_dir, file_name)
+
+        if os.path.exists(file_path):
+            old_df = pd.read_csv(file_path, index_col=0)
+            df_combined = pd.concat([old_df, df_new])
+            df_combined.to_csv(file_path)
+        else:
+            df_new.to_csv(file_path)
+
+        print(f"Updated {park_name} for {timestamp}")
 
     except Exception as e:
         print(f"Error collecting data for {park_name}: {e}")
