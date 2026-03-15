@@ -48,7 +48,7 @@ rides = {
     "ak": [
         "Expedition Everest - Legend of the Forbidden Mountain",
         "Avatar Flight of Passage",
-        "Na'vi River Journey",
+        "Na've River Journey",
         "Kilimanjaro Safaris",
         "Kali River Rapids"
     ]
@@ -72,21 +72,15 @@ for url, park_name in parks.items():
 
         row = {}
 
-        # Check if park is operating
+        # If park is closed, fill all rides with None (empty in CSV)
         if data.get("status") != "OPERATING":
-            # Park closed → all rides 0
-            row = {ride: 0 for ride in rides[park_name]}
+            row = {ride: None for ride in rides[park_name]}
 
         else:
             for ride in data.get("liveData", []):
                 if ride.get("entityType") == "ATTRACTION":
-
                     ride_name = ride["name"]
-
-                    match = next(
-                        (r for r in rides[park_name] if ride_name.startswith(r)),
-                        None
-                    )
+                    match = next((r for r in rides[park_name] if ride_name.startswith(r)), None)
 
                     if match:
                         wait_time = (
@@ -94,16 +88,16 @@ for url, park_name in parks.items():
                             .get("STANDBY", {})
                             .get("waitTime")
                         )
+                        # Store wait time or None if it's not available
+                        row[match] = wait_time if wait_time is not None else None
 
-                        row[match] = wait_time if wait_time is not None else 0
-
-            # Ensure every ride exists in the row
+            # Ensure every predefined ride is in the row (fill missing with None)
             for ride in rides[park_name]:
-                row.setdefault(ride, 0)
+                row.setdefault(ride, None)
 
         # Create dataframe
         df_new = pd.DataFrame([row], index=[timestamp])
-        df_new = df_new[rides[park_name]]  # enforce column order
+        df_new = df_new[rides[park_name]]  # Enforce column order
 
         # File path
         file_name = f"wait{park_name.upper()}.csv"
@@ -112,6 +106,8 @@ for url, park_name in parks.items():
         if os.path.exists(file_path):
             old_df = pd.read_csv(file_path, index_col=0)
             df_combined = pd.concat([old_df, df_new])
+            # Drop duplicates if run multiple times in the same minute
+            df_combined = df_combined[~df_combined.index.duplicated(keep='last')]
             df_combined.to_csv(file_path)
         else:
             df_new.to_csv(file_path)
