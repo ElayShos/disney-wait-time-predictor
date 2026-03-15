@@ -21,9 +21,11 @@ def average_hourly_wait_time(park):
 
     row = {}
 
-    def fix_num(x):
+    def fix_num(x, ride):
         x = int(x) if pd.notna(x) else 0
-        if (x != 13):
+        if (x == 13 and ('haunted mansion' in ride.lower() or 'tower of terror' in ride.lower())):
+            return x
+        else:
             x = round(x/5) * 5
         return x
 
@@ -32,7 +34,7 @@ def average_hourly_wait_time(park):
 
         for name, start, end in rules:
             val = time_blocks[name][ride].replace(0, pd.NA).mean()
-            val = fix_num(val)
+            val = fix_num(val, ride)
             avg_lines.append(val)
 
         row[ride] = avg_lines

@@ -1,7 +1,7 @@
 ,Toy Story Mania!,Mickey & Minnie's Runaway Railway,Millennium Falcon: Smugglers Run,Star Tours,Slinky Dog Dash,The Twilight Zone Tower of Terror,Star Wars: Rise of the Resistance,Rock 'n' Roller Coaster Starring Aerosmith
-Morning,30,30,40,5,60,20,0,0
-Late Morning,75,55,55,10,85,50,100,0
-Noon,90,50,80,5,90,45,80,0
+Morning,30,40,30,5,70,20,85,0
+Late Morning,60,55,60,15,100,50,90,0
+Noon,70,55,80,5,95,50,80,0
 Afternoon,60,50,60,5,80,50,65,0
 Evening,45,55,50,5,85,55,55,0
-Night,55,50,40,5,80,50,40,0
+Night,45,45,30,5,70,50,35,0
