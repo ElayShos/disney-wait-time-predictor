@@ -5,7 +5,6 @@ import glob
 import math
 
 def prepare_data():
-    # Load park list
     with open(os.path.join('rules', 'parks.txt'), 'r') as f:
         parks = [line.strip() for line in f]
 
@@ -13,31 +12,24 @@ def prepare_data():
     
     for park in parks:
         try:
-            # Construct path and find files
             path = os.path.join('data', '*', f'wait{park.upper()}.csv')
             files = glob.glob(path)
             
             if not files:
                 continue
             
-            # Combine all CSVs for the current park
             df = pd.concat(pd.read_csv(f) for f in files)
             
-            # Remove rows where all ride columns are NaN (assumes column 0 is timestamp)
             df.dropna(subset=df.columns[1:], how='all', inplace=True)
             
-            # Convert first column to datetime object
             timestamps = pd.to_datetime(df.iloc[:, 0], format='mixed')
             
-            # Extract features for Machine Learning
             df['day_of_week'] = timestamps.dt.dayofweek
             df['hour'] = timestamps.dt.hour
             
-            # Cyclic encoding for time (helps model understand 23:00 is near 00:00)
             df['hour_sin'] = np.sin(2 * np.pi * df['hour']/24.0)
             df['hour_cos'] = np.cos(2 * np.pi * df['hour']/24.0)
             
-            # Drop the original timestamp string column as ML models can't process it
             df.drop(df.columns[0], axis=1, inplace=True)
             df.drop(columns=['hour'], inplace=True)
             df = df.fillna(-1)

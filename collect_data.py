@@ -54,7 +54,6 @@ rides = {
     ]
 }
 
-# Time setup
 now_orlando = datetime.now(ZoneInfo("America/New_York"))
 date_str = now_orlando.strftime("%Y-%m-%d")
 timestamp = now_orlando.strftime("%Y-%m-%d %H:%M")
@@ -77,12 +76,10 @@ for url, park_name in parks.items():
             if ride_info.get("entityType") == "ATTRACTION":
                 api_ride_name = ride_info.get("name", "")
                 
-                # Check for match in our list
                 match = next((r for r in rides[park_name] if api_ride_name.startswith(r)), None)
 
                 if match:
                     queue = ride_info.get("queue", {})
-                    # If STANDBY exists, get the wait time
                     if "STANDBY" in queue:
                         wait_time = queue["STANDBY"].get("waitTime")
                         row[match] = wait_time
@@ -91,12 +88,10 @@ for url, park_name in parks.items():
                     else:
                         row[match] = None
 
-        # Fill missing rides in the row with None
         for ride in rides[park_name]:
             if ride not in row:
                 row[ride] = None
 
-        # Create/Update CSV
         df_new = pd.DataFrame([row], index=[timestamp])
         df_new = df_new[rides[park_name]]
 
