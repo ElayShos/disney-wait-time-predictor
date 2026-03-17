@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import os
 import glob
+import math
 
 def prepare_data():
     # Load park list
@@ -39,15 +40,17 @@ def prepare_data():
             # Drop the original timestamp string column as ML models can't process it
             df.drop(df.columns[0], axis=1, inplace=True)
             df.drop(columns=['hour'], inplace=True)
-            df = df.fillna(-1, inplace=True)
+            df = df.fillna(-1)
 
-            # Save the processed data
-            output_file = f'{park.upper()}test.csv'
-            df.to_csv(output_file, index=False)
+            new_cols = ['day_of_week', 'hour_sin', 'hour_cos']
+            other_cols = [c for c in df.columns if c not in new_cols]
+            df = df[new_cols + other_cols]
 
             df_list.append(df)
-            return pd.concat(df_list)
+            df_new = pd.concat(df_list)
 
         except Exception as e:
             print(f"Error processing {park}: {e}")
             continue
+        
+    return df_new
