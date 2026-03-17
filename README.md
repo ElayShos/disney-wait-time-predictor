@@ -28,6 +28,8 @@ It was built as a student project to practice data analysis and basic machine le
 
 Clone the repository:
 
+In your terminal (CMD for Windows):
+
 ```bash
 git clone https://github.com/ElayShos/disney-wait-time-predictor.git
 cd disney-wait-time-predictor
@@ -80,7 +82,7 @@ Hour of the day (0–23)
 * 13 = 13:00
 * 23 = 23:00
 
-Make sure to select an hour in which the park is open - most parks are open from 9:00 to 21:00
+Make sure to pick an hour when the park is open - most parks are open from 9:00 to 21:00
 
 ---
 
@@ -114,9 +116,9 @@ This project was created for 2 reasons:
 
 ## Skills acquired during the development
 
-* Learning a new API
-* Working with real datasets
-* Using pandas for data processing
-* Training a machine learning model
+- Working with a new API
+- Handling real-world data
+- Using pandas for data processing
+- Training a machine learning model
 
 ---
