@@ -18,6 +18,7 @@ parks = {
     f"https://api.themeparks.wiki/v1/entity/{ak}/live": "ak"
 }
 
+# Updated ride list with more flexible names
 rides = {
     "mk": [
         "TRON Lightcycle / Run", "Seven Dwarfs Mine Train", "Jungle Cruise",
@@ -37,8 +38,8 @@ rides = {
     ],
     "hs": [
         "Star Wars: Rise of the Resistance",
-        "Rock 'n' Roller Coaster Starring Aerosmith",
-        "The Twilight Zone Tower of Terror",
+        "Rock 'n' Roller Coaster",
+        "Tower of Terror",
         "Millennium Falcon: Smugglers Run",
         "Slinky Dog Dash",
         "Mickey & Minnie's Runaway Railway",
@@ -46,8 +47,8 @@ rides = {
         "Star Tours"
     ],
     "ak": [
-        "Expedition Everest - Legend of the Forbidden Mountain",
-        "Avatar Flight of Passage",
+        "Expedition Everest",
+        "Flight of Passage",
         "Na'vi River Journey",
         "Kilimanjaro Safaris",
         "Kali River Rapids"
@@ -69,17 +70,18 @@ for url, park_name in parks.items():
 
         row = {}
         found_any_data = False
-
         live_data = data.get("liveData", [])
         
         for ride_info in live_data:
             if ride_info.get("entityType") == "ATTRACTION":
                 api_ride_name = ride_info.get("name", "")
                 
-                match = next((r for r in rides[park_name] if api_ride_name.startswith(r)), None)
+                # IMPROVED MATCHING: Checks if your nickname exists anywhere in the API name
+                match = next((r for r in rides[park_name] if r.lower() in api_ride_name.lower()), None)
 
                 if match:
                     queue = ride_info.get("queue", {})
+                    # Check for standard standby wait time
                     if "STANDBY" in queue:
                         wait_time = queue["STANDBY"].get("waitTime")
                         row[match] = wait_time
@@ -88,6 +90,7 @@ for url, park_name in parks.items():
                     else:
                         row[match] = None
 
+        # Ensure all rides are present in the row, even if not found in API
         for ride in rides[park_name]:
             if ride not in row:
                 row[ride] = None
